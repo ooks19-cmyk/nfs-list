@@ -1,0 +1,59 @@
+name: Refresh Naver place counts
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Firestore에 쓰지 않고 조회 결과만 확인합니다.'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SERVICE_ACCOUNT_PATH: ${{ runner.temp }}/firebase-service-account.json
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Create temporary Firebase credential file
+        shell: bash
+        run: |
+          if [[ -z "$FIREBASE_SERVICE_ACCOUNT" ]]; then
+            echo "FIREBASE_SERVICE_ACCOUNT GitHub Actions secret is required."
+            exit 1
+          fi
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$SERVICE_ACCOUNT_PATH"
+          chmod 600 "$SERVICE_ACCOUNT_PATH"
+
+      - name: Refresh Firestore place counts
+        shell: bash
+        run: |
+          args=(--service-account "$SERVICE_ACCOUNT_PATH")
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          node scripts/refresh-naver-place-counts.mjs "${args[@]}"

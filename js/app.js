@@ -600,6 +600,11 @@
       .replace(/'/g, '&#039;');
   }
 
+  function getPlaceCount(value) {
+    const count = Number(value);
+    return Number.isInteger(count) && count > 0 ? count : null;
+  }
+
   function getProcessedLists() {
     let result = [...allLists];
 
@@ -651,6 +656,7 @@
       const isLiked = store.isLikedByUser(item.id);
       const commentCount = item.comments ? item.comments.length : 0;
       const cleanUrl = Security.extractUrl(item.naverUrl);
+      const placeCount = getPlaceCount(item.placeCount);
 
       return `
         <article class="gourmet-card" data-id="${item.id}">
@@ -664,7 +670,7 @@
               </div>
             </div>
 
-            <h3 class="card-title">${escapeHtml(item.title)}</h3>
+            <h3 class="card-title">${escapeHtml(item.title)}${placeCount ? ` <span class="card-place-count" aria-label="저장된 맛집 ${placeCount}개">🍽️ ${placeCount}곳</span>` : ''}</h3>
             <p class="card-desc">${escapeHtml(item.description)}</p>
 
             <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="card-naver-box">

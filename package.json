@@ -1,0 +1,11 @@
+{
+  "name": "gourmet-list-admin-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh:place-counts": "node scripts/refresh-naver-place-counts.mjs --dry-run"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

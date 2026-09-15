@@ -63,6 +63,22 @@ export const firebaseConfig = {
 
 ---
 
+## 🤖 관리자용 네이버 지도 목록 수 갱신
+
+웹 페이지는 네이버 지도를 직접 파싱하지 않습니다. 관리자가 필요할 때마다 배치 스크립트를 실행하면, Firestore의 `gourmet_lists`를 순회하여 공개 네이버 저장 리스트의 ‘저장된 장소 수’를 읽고 기록합니다.
+
+1. Firebase Console에서 전용 서비스 계정을 만든 뒤 JSON 키를 발급합니다. 서비스 계정에는 Firestore를 읽고 쓸 권한이 필요합니다.
+2. GitHub 저장소의 **Settings → Secrets and variables → Actions**에서 `FIREBASE_SERVICE_ACCOUNT`라는 이름의 secret을 만듭니다. 값은 서비스 계정 JSON 파일 전체 내용입니다. JSON 키 파일은 저장소에 올리지 않습니다.
+3. GitHub 저장소의 **Actions → Refresh Naver place counts → Run workflow**를 실행합니다. 처음에는 `dry_run` 실행으로 로그만 확인하고, 결과가 정상이면 `dry_run`을 끄고 실행하세요.
+
+실행은 GitHub의 임시 서버에서 이루어지므로 관리자가 사용하는 PC나 모바일에 브라우저 자동화 환경이 있을 필요가 없습니다. Firestore 문서에 `placeCount`, `placeCountUpdatedAt`, `placeCountStatus`, `placeCountError` 필드가 기록됩니다.
+
+이 PC에서 실행하려면 프로젝트 최상위의 `run-refresh-place-counts.bat`을 더블클릭하고, Firebase 서비스 계정 JSON 파일 경로를 입력하세요. 처음에는 기본 설정인 점검 모드로 실행한 후, 결과를 확인하고 저장 모드를 선택하세요.
+
+공개로 공유된 네이버 저장 리스트만 처리하며, 네이버의 화면·정책 변경으로 실패할 경우 실패 사유를 기록하고 다음 배치에서 다시 시도합니다. 웹 페이지에서 실행하는 트리거는 추후 다룹니다.
+
+---
+
 ## 📂 파일 구조
 
 ```

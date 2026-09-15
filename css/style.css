@@ -445,6 +445,15 @@ body {
   overflow: hidden;
 }
 
+.card-place-count {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .card-naver-box {
   background: var(--naver-light);
   border: 1px solid rgba(3, 199, 90, 0.25);
